@@ -29,4 +29,6 @@ def profile(username):
 # Como não utilizamos o @app.route para a view profile, utilizamos o add_url_rule
 app.add_url_rule('/user/<username>', view_func=profile, endpoint='user')
 
-app.run(use_reloader=True)
+
+if __name__ == '__main__':
+    app.run(use_reloader=True)
