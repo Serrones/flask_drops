@@ -1,5 +1,5 @@
 import db
-from flask import Flask, abort, url_for
+from flask import Flask, abort, url_for, jsonify, current_app
 from converters import RegexConverter, ListConverter
 
 app =Flask(__name__)
@@ -14,7 +14,9 @@ def index():
             f"<li><a href='{url_for('user', username=username)}'>{user['name']}</a></li>"
         )
     html.append('</ul>')
-    return '\n'.join(html)
+    # passando parâmetros de Response, que é uma tupla que
+    # contém string, status_code e headers
+    return '\n'.join(html), 200, {'X-Hello': 'World'}
 
 def profile(username):
     user = db.users.get(username)
@@ -82,6 +84,31 @@ def list(names):
                 <hr />
             """
     return html or abort(404, "Users not found")
+
+# criar uma função para entregar um xml para o cliente
+@app.route('/xml/')
+def xml():
+    return "<user name ='Serrones'/>", 200, {'Content-Type': 'application/xml'}
+
+# criar uma função para entregar um json para o cliente
+@app.route('/json/')
+def json():
+    return "{'user' : 'Serrones'}", 200, {'Content-Type': 'application/json'}
+
+# criar uma função para entregar um json através do jsonify para o cliente
+@app.route('/jsonify/')
+def turn_json():
+    return jsonify(user={'name':'Serrones'})
+
+# criar um cookie
+@app.route('/cookie/')
+def cria_cookie():
+    response = current_app.make_response("Hello")
+
+    response.set_cookie('name', value='Serrones')
+    response.set_cookie('framework', value='Flask')
+
+    return response
 
 if __name__ == '__main__':
     app.run(use_reloader=True)
